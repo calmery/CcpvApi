@@ -1,0 +1,84 @@
+version: 2
+
+jobs:
+  test:
+    docker:
+      - image: circleci/node:10.1.0
+
+    working_directory: ~/ccpv
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+
+      - run: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: npm run test
+
+      - persist_to_workspace:
+          root: ~/
+          paths: ./*
+
+  build:
+    docker:
+      - image: circleci/node:10.1.0
+
+    working_directory: ~/ccpv
+
+    steps:
+      - attach_workspace:
+          at: ~/
+
+      - run: npm run build
+
+      - persist_to_workspace:
+          root: ~/
+          paths: ./*
+
+  deploy:
+    docker:
+      - image: circleci/node:10.1.0
+
+    working_directory: ~/ccpv
+
+    steps:
+      - attach_workspace:
+          at: ~/
+
+      - run: git config --global user.name $GH_NAME
+      - run: git config --global user.email $GH_EMAIL
+      - run: git add -f dist/
+      - run: git commit -m "Deploy"
+      - run:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+            fi
+
+workflows:
+  version: 2
+
+  test-build-and-deploy:
+    jobs:
+      - test
+
+      - build:
+          requires:
+            - test
+
+      - deploy:
+          requires:
+            - build
+
+          filters:
+            branches:
+              only: master
