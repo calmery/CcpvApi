@@ -1,3 +1,15 @@
 {
-  "extends": "tslint-config-standard"
+  "extends": "tslint-config-standard",
+  "rules": {
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-snake-case"
+    ],
+    "await-promise": [
+      true,
+      "Bluebird"
+    ]
+  }
 }

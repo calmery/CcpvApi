@@ -2,6 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -13,6 +15,7 @@
     },
     "sourceMap": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "target": "es2015"
   },
   "include": [
