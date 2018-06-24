@@ -21,7 +21,7 @@ export const SEQUELIZE_CONFIG = (() => {
     const config = url.parse(process.env.DATABASE_URL)
 
     return Object.assign(baseConfig, {
-      host: config.host,
+      host: config.hostname,
       username: config.auth!.split(':')[0],
       password: config.auth!.split(':')[1],
       name: config.path!.slice(1)
