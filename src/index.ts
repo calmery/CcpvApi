@@ -72,7 +72,7 @@ app.post('/authentication', async (request, response) => {
 const _ = (async () => {
   try {
     await sequelize.sync()
-    app.listen(process.env.PORT || 3000)
+    app.listen(process.env.PORT || 8000)
   } catch (error) {
     throw error
   }
