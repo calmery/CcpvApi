@@ -54,10 +54,6 @@ jobs:
       - attach_workspace:
           at: ~/
 
-      - run: git config --global user.name $GH_NAME
-      - run: git config --global user.email $GH_EMAIL
-      - run: git add -f dist/
-      - run: git commit -m "Deploy"
       - run:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
