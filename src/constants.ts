@@ -1,4 +1,7 @@
 import url from 'url'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 // Postgres
 export const SEQUELIZE_CONFIG = (() => {
