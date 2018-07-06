@@ -1,11 +1,11 @@
 import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, Unique, CreatedAt, UpdatedAt, IsUUID, Default } from 'sequelize-typescript'
 
 @Table({
-  tableName: 'users',
+  tableName: 'accounts',
   timestamps: true,
   paranoid: true
 })
-export default class Users extends Model<Users> {
+export default class Accounts extends Model<Accounts> {
   @PrimaryKey
   @AutoIncrement
 	@Column

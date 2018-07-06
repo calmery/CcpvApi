@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize-typescript'
 import * as Constants from './constants'
-import Users from './models/users'
+import Accounts from './models/accounts'
 
 const sequelize = new Sequelize(Constants.SEQUELIZE_CONFIG)
 
-sequelize.addModels([Users])
+sequelize.addModels([Accounts])
 
 export default sequelize
