@@ -6,7 +6,7 @@ import firebase from './firebase'
 
 import Sequelize from 'sequelize'
 import sequelize from './sequelize'
-import Users from './models/users'
+import Accounts from './models/accounts'
 
 const app = express()
 
@@ -30,7 +30,7 @@ app.post('/authentication', async (request, response) => {
   // Firebase に問い合わせる
   const verified = await firebase.auth().verifyIdToken(firebaseIdToken)
 
-  const alreadyRegistered = await Users.find({
+  const alreadyRegistered = await Accounts.find({
     where: {
       firebase_id: {
         [Sequelize.Op.eq]: verified.uid
@@ -40,7 +40,7 @@ app.post('/authentication', async (request, response) => {
 
   if (alreadyRegistered === null) {
     try {
-      const user = Users.build({
+      const user = Accounts.build({
         name: verified.name,
         firebase_id: verified.uid,
         access_token: accessToken,
