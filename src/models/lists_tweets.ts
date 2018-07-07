@@ -1,4 +1,4 @@
-import { Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, Default, BelongsTo, ForeignKey } from 'sequelize-typescript'
+import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, Default, BelongsTo, ForeignKey } from 'sequelize-typescript'
 import List from './lists'
 import Tweet from './tweets'
 
@@ -19,7 +19,7 @@ export default class ListTweet extends Model<ListTweet> {
 
   @AllowNull(false)
   @ForeignKey(() => Tweet)
-  @Column
+  @Column(Sequelize.BIGINT)
   tweet_id: number
 
   @AllowNull(false)

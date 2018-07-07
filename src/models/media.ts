@@ -1,4 +1,4 @@
-import { Table, Column, Model, AllowNull, PrimaryKey, BelongsTo, ForeignKey } from 'sequelize-typescript'
+import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, BelongsTo, ForeignKey } from 'sequelize-typescript'
 import Tweet from './tweets'
 
 @Table({
@@ -11,8 +11,8 @@ export default class Media extends Model<Media> {
 	id: number
 
   @AllowNull(false)
-	@Column
   @ForeignKey(() => Tweet)
+  @Column(Sequelize.BIGINT)
 	tweet_id: number
 
   @AllowNull(false)
