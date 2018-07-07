@@ -1,4 +1,4 @@
-import { Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey } from 'sequelize-typescript'
+import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey } from 'sequelize-typescript'
 import Users from './users'
 import Tweets from './tweets'
 
@@ -14,12 +14,12 @@ export default class Mentions extends Model<Mentions> {
 
   @AllowNull(false)
   @ForeignKey(() => Tweets)
-	@Column
+	@Column(Sequelize.BIGINT)
 	tweet_id: number
 
   @AllowNull(false)
   @ForeignKey(() => Users)
-	@Column
+	@Column(Sequelize.BIGINT)
 	user_id: number
 
   @BelongsTo(() => Tweets)

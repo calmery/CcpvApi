@@ -1,4 +1,4 @@
-import { DataType, Table, Column, Model, AllowNull, PrimaryKey, HasMany } from 'sequelize-typescript'
+import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, HasMany } from 'sequelize-typescript'
 
 import Tweet from './tweets'
 import Mention from './mentions'
@@ -9,7 +9,7 @@ import Mention from './mentions'
 })
 export default class User extends Model<User> {
   @PrimaryKey
-	@Column
+	@Column(Sequelize.BIGINT)
 	id: number
 
   @AllowNull(false)
@@ -53,7 +53,7 @@ export default class User extends Model<User> {
 	profile_banner_url: string
 
   @AllowNull(false)
-	@Column(DataType.DATE)
+	@Column(Sequelize.DATE)
   created_at: Date
 
   @HasMany(() => Tweet)

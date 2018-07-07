@@ -1,4 +1,4 @@
-import { DataType, Table, Column, Model, AllowNull, PrimaryKey, Default, BelongsTo, HasMany, HasOne, ForeignKey } from 'sequelize-typescript'
+import { Sequelize, DataType, Table, Column, Model, AllowNull, PrimaryKey, Default, BelongsTo, HasMany, HasOne, ForeignKey } from 'sequelize-typescript'
 import ListTweet from './lists_tweets'
 import User from './users'
 import Media from './media'
@@ -10,7 +10,7 @@ import Mention from './mentions'
 })
 export default class Tweet extends Model<Tweet> {
   @PrimaryKey
-	@Column
+	@Column(Sequelize.BIGINT)
 	id: number
 
   @AllowNull(false)
@@ -18,8 +18,8 @@ export default class Tweet extends Model<Tweet> {
 	text: string
 
   @AllowNull(false)
-	@Column
   @ForeignKey(() => User)
+  @Column(Sequelize.BIGINT)
 	user_id: number
 
   @AllowNull(false)
