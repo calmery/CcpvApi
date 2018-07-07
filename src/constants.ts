@@ -35,7 +35,7 @@ export const SEQUELIZE_CONFIG = (() => {
     host: 'localhost',
     username: '',
     password: '',
-    name: 'ccpv', // Database name
+    name: 'ccpv' // Database name
   })
 })()
 
@@ -43,3 +43,7 @@ export const SEQUELIZE_CONFIG = (() => {
 export const PROJECT_ID = process.env.PROJECT_ID
 export const PRIVATE_KEY = unescape(process.env.PRIVATE_KEY!)
 export const CLIENT_EMAIL = process.env.CLIENT_EMAIL
+
+// Twitter
+export const CONSUMER_KEY = process.env.CONSUMER_KEY!
+export const CONSUMER_SECRET = process.env.CONSUMER_SECRET!

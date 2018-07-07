@@ -5,7 +5,7 @@ firebase.initializeApp({
   credential: firebase.credential.cert({
     projectId: Constants.PROJECT_ID,
     privateKey: Constants.PRIVATE_KEY,
-    clientEmail: Constants.CLIENT_EMAIL,
+    clientEmail: Constants.CLIENT_EMAIL
   })
 })
 
