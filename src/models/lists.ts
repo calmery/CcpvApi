@@ -26,11 +26,6 @@ export default class List extends Model<List> {
 	@Column
 	query: string
 
-  @AllowNull(false)
-  @Default(false)
-	@Column
-	is_available: boolean
-
   @CreatedAt
   createdAt: Date
 
