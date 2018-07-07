@@ -6,7 +6,9 @@ import firebase from './firebase'
 
 import Sequelize from 'sequelize'
 import sequelize from './sequelize'
-import Accounts from './models/accounts'
+import Account from './models/accounts'
+
+import search from './twitter'
 
 const app = express()
 
@@ -16,6 +18,41 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', (request, response) => {
   response.send('Hello !')
+})
+
+app.post('/create', async (request, response) => {
+  const apiKey = request.headers['x-api-key'] // Get Api Key From Headers
+  const name = request.body.name
+  const query = request.body.query
+
+  if (name === undefined || name === '' || query === undefined || query === '') {
+    response.status(400).end()
+  }
+
+  try {
+    const account = await Account.find({
+      where: {
+        api_key: {
+          [Sequelize.Op.eq]: apiKey
+        }
+      }
+    })
+
+    const result = await search(account!.access_token, account!.access_token_secret, query)
+
+    // Insert
+    // updateOnDuplicate オプションを使う
+
+    /*
+    const statuses: Status[] = result.statuses.map((status: Twit.Twitter.Status): Status => {
+      return { id: 1 }
+    })
+    */
+
+    response.status(200).json(result)
+  } catch (error) {
+    response.status(500).end()
+  }
 })
 
 app.post('/authentication', async (request, response) => {
@@ -30,7 +67,7 @@ app.post('/authentication', async (request, response) => {
   // Firebase に問い合わせる
   const verified = await firebase.auth().verifyIdToken(firebaseIdToken)
 
-  const alreadyRegistered = await Accounts.find({
+  const alreadyRegistered = await Account.find({
     where: {
       firebase_id: {
         [Sequelize.Op.eq]: verified.uid
@@ -40,7 +77,7 @@ app.post('/authentication', async (request, response) => {
 
   if (alreadyRegistered === null) {
     try {
-      const user = Accounts.build({
+      const user = Account.build({
         name: verified.name,
         firebase_id: verified.uid,
         access_token: accessToken,
