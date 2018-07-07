@@ -34,7 +34,8 @@
     "pg": "^7.4.3",
     "reflect-metadata": "^0.1.12",
     "sequelize": "^4.38.0",
-    "sequelize-typescript": "^0.6.5"
+    "sequelize-typescript": "^0.6.5",
+    "twit": "^2.2.11"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
@@ -45,6 +46,7 @@
     "@types/node": "^9.4.6",
     "@types/sequelize": "^4.27.23",
     "@types/supertest": "^2.0.4",
+    "@types/twit": "^2.2.15",
     "concurrently": "^3.5.1",
     "dotenv": "^6.0.0",
     "jest": "^22.0.4",
