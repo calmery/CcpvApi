@@ -7,7 +7,7 @@ import Tweet from './tweets'
 })
 export default class Media extends Model<Media> {
   @PrimaryKey
-	@Column
+	@Column(Sequelize.BIGINT)
 	id: number
 
   @AllowNull(false)

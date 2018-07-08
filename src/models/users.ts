@@ -28,15 +28,15 @@ export default class User extends Model<User> {
 	@Column
 	url: string
 
-  @AllowNull(false)
+  @AllowNull(true)
 	@Column
 	followers_count: number
 
-  @AllowNull(false)
+  @AllowNull(true)
 	@Column
 	friends_count: number
 
-  @AllowNull(false)
+  @AllowNull(true)
 	@Column
 	statuses_count: number
 
@@ -52,7 +52,7 @@ export default class User extends Model<User> {
 	@Column
 	profile_banner_url: string
 
-  @AllowNull(false)
+  @AllowNull(true)
 	@Column(Sequelize.DATE)
   created_at: Date
 
