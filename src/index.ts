@@ -12,6 +12,7 @@ import ListTweet from './models/lists_tweets'
 import Tweet from './models/tweets'
 import User from './models/users'
 import Media from './models/media'
+import Mention from './models/mentions'
 
 import search from './twitter'
 
@@ -25,7 +26,39 @@ app.get('/', (request, response) => {
   response.send('Hello !')
 })
 
-app.post('/create', async (request, response) => {
+app.get('/list', async (request, response) => {
+  const apiKey = request.headers['x-api-key'] // Get Api Key From Headers
+
+  try {
+    const account = await Account.find({
+      where: {
+        api_key: {
+          [Sequelize.Op.eq]: apiKey
+        }
+      }
+    })
+
+    if (account === null) {
+      response.status(401).end()
+      return
+    }
+
+    const list = await List.findAll({
+      where: {
+        account_id: {
+          [Sequelize.Op.eq]: account.dataValues.id
+        }
+      },
+      attributes: ['id', 'name', 'query', 'created_at', 'updated_at']
+    })
+
+    response.status(200).json(list)
+  } catch (_) {
+    response.status(500).end()
+  }
+})
+
+app.post('/list', async (request, response) => {
   const apiKey = request.headers['x-api-key'] // Get Api Key From Headers
   const name = request.body.name
   const query = request.body.query
@@ -137,6 +170,14 @@ app.post('/create', async (request, response) => {
               name: mention.name,
               screen_name: mention.screen_name
             })
+
+            await Mention.upsert({
+              id: mention.id,
+              name: mention.name,
+              tweet_id: status.id,
+              user_id: mention.id,
+              screen_name: mention.screen_name
+            })
           })
         }
 
@@ -152,8 +193,15 @@ app.post('/create', async (request, response) => {
       await listTweet.save()
     }
 
-    response.status(200).json(list)
+    response.status(200).json({
+      id: list.id,
+      name: list.name,
+      query: list.query,
+      created_at: list.created_at,
+      updated_at: list.updated_at
+    })
   } catch (error) {
+    console.log(error)
     response.status(500).end()
   }
 })
@@ -194,7 +242,7 @@ app.post('/authentication', async (request, response) => {
         name: user.getDataValue('name'),
         api_key: user.getDataValue('api_key')
       })
-    } catch (error) {
+    } catch (_) {
       response.status(500).end()
     }
 

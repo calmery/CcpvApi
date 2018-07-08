@@ -27,10 +27,10 @@ export default class List extends Model<List> {
 	query: string
 
   @CreatedAt
-  createdAt: Date
+  created_at: Date
 
   @UpdatedAt
-  updatedAt: Date
+  updated_at: Date
 
   @DeletedAt
   deleted_at: Date
