@@ -1,4 +1,4 @@
-import { Model, Table, Column, AllowNull, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, DeletedAt, Default, BelongsTo, ForeignKey, HasMany } from 'sequelize-typescript'
+import { Model, Table, Column, AllowNull, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, DeletedAt, BelongsTo, ForeignKey, HasMany } from 'sequelize-typescript'
 import Account from './accounts'
 import ListsTweets from './lists_tweets'
 
