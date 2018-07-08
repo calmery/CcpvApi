@@ -53,7 +53,7 @@ app.get('/list', async (request, response) => {
     })
 
     response.status(200).json(list)
-  } catch (_) {
+  } catch(_) {
     response.status(500).end()
   }
 })
@@ -259,9 +259,7 @@ app.post('/authentication', async (request, response) => {
 // Postgres との同期が完了してからサーバを起動する
 const _ = (async () => {
   try {
-    await sequelize.sync({
-      force: true
-    })
+    await sequelize.sync()
     app.listen(process.env.PORT || 8000)
   } catch (error) {
     throw error
