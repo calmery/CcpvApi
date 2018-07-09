@@ -172,7 +172,6 @@ app.post('/list', async (request, response) => {
             })
 
             await Mention.upsert({
-              id: mention.id,
               name: mention.name,
               tweet_id: status.id,
               user_id: mention.id,
