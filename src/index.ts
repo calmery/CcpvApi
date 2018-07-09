@@ -7,6 +7,9 @@ import firebase from './firebase'
 import Sequelize from 'sequelize'
 import sequelize from './sequelize'
 import Accounts from './models/accounts'
+import Notifications from './models/notifications'
+
+import { URL, PORT, NUMBER_OF_NOTIFICATIONS } from './constants'
 
 const app = express()
 
@@ -16,6 +19,38 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', (request, response) => {
   response.send('Hello !')
+})
+
+// お知らせを取得する
+// /notification?start=読み飛ばすお知らせの個数
+// /notification?start=0（/notification） 初めから
+// /notification?start=5 5 個読み飛ばす，6 個目の位置から
+app.get('/notification', async (request, response) => {
+  try {
+    const start = parseInt(request.query.start, 10) || 0
+
+    const notifications = await Notifications.findAll({
+      limit: NUMBER_OF_NOTIFICATIONS,
+      offset: start,
+      order: [
+        ['created_at', 'DESC']
+      ]
+    })
+
+    let next_url = null
+
+    // 取得した通知が limit で指定した値であるとき，まだ通知が存在する可能性があるので次の通知を取得するための URL を返す．
+    if (notifications.length === NUMBER_OF_NOTIFICATIONS) {
+      next_url = `${URL}/notification?start=${start + NUMBER_OF_NOTIFICATIONS}`
+    }
+
+    response.json({
+      notifications,
+      next_url
+    })
+  } catch (_) {
+    response.status(500).end()
+  }
 })
 
 app.post('/authentication', async (request, response) => {
@@ -72,7 +107,7 @@ app.post('/authentication', async (request, response) => {
 const _ = (async () => {
   try {
     await sequelize.sync()
-    app.listen(process.env.PORT || 8000)
+    app.listen(PORT)
   } catch (error) {
     throw error
   }
