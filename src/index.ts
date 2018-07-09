@@ -78,6 +78,7 @@ app.post('/list', (request, response) => {
 
   if (name === undefined || query === undefined) {
     response.status(400).end()
+    return
   }
 
   response.json({
