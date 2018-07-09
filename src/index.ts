@@ -18,6 +18,81 @@ app.get('/', (request, response) => {
   response.send('Hello !')
 })
 
+app.get('/notification', (request, response) => {
+  response.json([
+    {
+      id: 1,
+      title: 'Notification 1',
+      message: 'Notification Message 1'
+    },
+    {
+      id: 2,
+      title: 'Notification 2',
+      message: 'Notification Message 2'
+    },
+    {
+      id: 3,
+      title: 'Notification 3',
+      message: 'Notification Message 3'
+    },
+    {
+      id: 4,
+      title: 'Notification 4',
+      message: 'Notification Message 4'
+    },
+    {
+      id: 5,
+      title: 'Notification 5',
+      message: 'Notification Message 5'
+    }
+  ])
+})
+
+app.get('/list', (request, response) => {
+  response.json([
+    {
+      id: 1,
+      name: 'List 1',
+      query: 'Query 1'
+    },
+    {
+      id: 2,
+      name: 'List 2',
+      query: 'Query 2'
+    },
+    {
+      id: 3,
+      name: 'List 3',
+      query: 'Query 3'
+    },
+    {
+      id: 4,
+      name: 'List 4',
+      query: 'Query 4'
+    },
+    {
+      id: 5,
+      name: 'List 5',
+      query: 'Query 5'
+    }
+  ])
+})
+
+app.post('/list', (request, response) => {
+  const name = request.body.name
+  const query = request.body.query
+
+  if (name === undefined || query === undefined) {
+    response.status(400).end()
+  }
+
+  response.json({
+    id: 5,
+    name,
+    query,
+  })
+})
+
 app.post('/authentication', async (request, response) => {
   const firebaseIdToken = request.body.firebase_id_token
   const accessToken = request.body.access_token
