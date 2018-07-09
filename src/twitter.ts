@@ -4,7 +4,7 @@ import * as Constants from './constants'
 const search = (client: Twit, query: string): Promise<Twit.Twitter.SearchResults> => {
   return new Promise((resolve, reject) => {
     client.get('search/tweets', {
-      q: query,
+      q: `${query} -RT`,
       count: 10
     }, (error, data, response) => {
       if (error) {
