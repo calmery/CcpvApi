@@ -65,7 +65,12 @@ app.post('/list', async (request, response) => {
 
   if (name === undefined || name === '' || query === undefined || query === '') {
     response.status(400).end()
+    return
   }
+
+  const transaction = await sequelize.transaction({
+    autocommit: false
+  })
 
   try {
     const account = await Account.find({
@@ -81,6 +86,8 @@ app.post('/list', async (request, response) => {
       return
     }
 
+    // Search
+
     const result = await search(account.access_token, account.access_token_secret, query)
     const statuses = result.statuses
 
@@ -92,7 +99,9 @@ app.post('/list', async (request, response) => {
       query
     })
 
-    await list.save()
+    await list.save({
+      transaction
+    })
 
     // Insert data of Twitter (ListTweet, Tweet, User, Media, Mention)
 
@@ -115,6 +124,8 @@ app.post('/list', async (request, response) => {
         profile_background_image_url: status.user.profile_background_image_url_https,
         profile_banner_url: status.user.profile_banner_url,
         created_at: new Date(status.user.created_at)
+      }, {
+        transaction
       })
 
       // Find Or Create Tweet Column
@@ -131,7 +142,8 @@ app.post('/list', async (request, response) => {
           retweet_count: status.retweet_count,
           favorite_count: status.favorite_count,
           created_at: new Date(status.created_at)
-        }
+        },
+        transaction
       })
 
       // Media and Mention
@@ -156,7 +168,8 @@ app.post('/list', async (request, response) => {
                 media_url: entities.media[i].url,
                 type: entities.media[i].type,
                 display_url: entities.media[i].display_url
-              }
+              },
+              transaction
             })
           }
         }
@@ -164,11 +177,15 @@ app.post('/list', async (request, response) => {
         // Mention
 
         if (entities.hasOwnProperty('user_mentions')) {
-          entities.user_mentions.forEach(async mention => {
+          for (let i = 0; i < entities.user_mentions.length; i++) {
+            const mention = entities.user_mentions[i]
+
             await User.upsert({
               id: mention.id,
               name: mention.name,
               screen_name: mention.screen_name
+            }, {
+              transaction
             })
 
             await Mention.upsert({
@@ -176,21 +193,24 @@ app.post('/list', async (request, response) => {
               tweet_id: status.id,
               user_id: mention.id,
               screen_name: mention.screen_name
+            }, {
+              transaction
             })
-          })
+          }
         }
-
       }
 
       // Save ListTweet
 
-      const listTweet = ListTweet.build({
+      await ListTweet.build({
         list_id: list.dataValues.id,
         tweet_id: status.id
+      }).save({
+        transaction
       })
-
-      await listTweet.save()
     }
+
+    await transaction.commit()
 
     response.status(200).json({
       id: list.id,
@@ -200,7 +220,7 @@ app.post('/list', async (request, response) => {
       updated_at: list.updated_at
     })
   } catch (error) {
-    console.log(error)
+    transaction.rollback()
     response.status(500).end()
   }
 })
