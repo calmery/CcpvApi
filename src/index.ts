@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 
@@ -26,22 +26,36 @@ app.get('/', (request, response) => {
   response.send('Hello !')
 })
 
-app.get('/list', async (request, response) => {
-  const apiKey = request.headers['x-api-key'] // Get Api Key From Headers
+interface Request extends express.Request {
+  account?: Account
+}
 
-  try {
-    const account = await Account.find({
-      where: {
-        api_key: {
-          [Sequelize.Op.eq]: apiKey
-        }
+// Middleware
+
+const requireApiKey = (request: Request, response: Response, next: NextFunction) => {
+  const apiKey = request.headers['x-api-key']
+
+  Account.find({
+    where: {
+      api_key: {
+        [Sequelize.Op.eq]: apiKey
       }
-    })
-
+    }
+  }).then(account => {
     if (account === null) {
       response.status(401).end()
       return
     }
+
+    request.account = account
+
+    next()
+  })
+}
+
+app.get('/list', requireApiKey, async (request: Request, response: Response) => {
+  try {
+    const account = request.account!
 
     const list = await List.findAll({
       where: {
@@ -53,13 +67,12 @@ app.get('/list', async (request, response) => {
     })
 
     response.status(200).json(list)
-  } catch(_) {
+  } catch (_) {
     response.status(500).end()
   }
 })
 
-app.post('/list', async (request, response) => {
-  const apiKey = request.headers['x-api-key'] // Get Api Key From Headers
+app.post('/list', requireApiKey, async (request: Request, response: Response) => {
   const name = request.body.name
   const query = request.body.query
 
@@ -73,18 +86,7 @@ app.post('/list', async (request, response) => {
   })
 
   try {
-    const account = await Account.find({
-      where: {
-        api_key: {
-          [Sequelize.Op.eq]: apiKey
-        }
-      }
-    })
-
-    if (account === null) {
-      response.status(401).end()
-      return
-    }
+    const account = request.account!
 
     // Search
 
