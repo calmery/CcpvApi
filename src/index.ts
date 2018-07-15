@@ -1,6 +1,7 @@
 import express, { Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import Twit from 'twit'
 
 import firebase from './firebase'
 
@@ -72,29 +73,17 @@ app.get('/list', requireApiKey, async (request: Request, response: Response) => 
   }
 })
 
-app.post('/list', requireApiKey, async (request: Request, response: Response) => {
-  const name = request.body.name
-  const query = request.body.query
+// Create List
 
-  if (name === undefined || name === '' || query === undefined || query === '') {
-    response.status(400).end()
-    return
-  }
+const createList = async (account: Account, name: string, searchResults: Twit.Twitter.SearchResults): Promise<List | null> => {
+  const query = searchResults.search_metadata.query
+  const statuses = searchResults.statuses
 
   const transaction = await sequelize.transaction({
     autocommit: false
   })
 
   try {
-    const account = request.account!
-
-    // Search
-
-    const result = await search(account.access_token, account.access_token_secret, query)
-    const statuses = result.statuses
-
-    // Create New List
-
     const list = List.build({
       account_id: account.dataValues.id,
       name,
@@ -152,7 +141,6 @@ app.post('/list', requireApiKey, async (request: Request, response: Response) =>
       // status.entities が存在する場合のみ実行する
 
       if (status.hasOwnProperty('entities')) {
-
         const entities = status.entities
 
         // Media
@@ -213,16 +201,38 @@ app.post('/list', requireApiKey, async (request: Request, response: Response) =>
     }
 
     await transaction.commit()
+    return list
+  } catch (error) {
+    await transaction.rollback()
+    return null
+  }
+}
+
+app.post('/list', requireApiKey, async (request: Request, response: Response) => {
+  const name = request.body.name
+  const query = request.body.query
+
+  if (name === undefined || name === '' || query === undefined || query === '') {
+    response.status(400).end()
+    return
+  }
+
+  try {
+    const account = request.account!
+
+    // Search
+
+    const searchResults = await search(account.access_token, account.access_token_secret, query)
+    const list = await createList(account, name, searchResults)
 
     response.status(200).json({
-      id: list.id,
-      name: list.name,
-      query: list.query,
-      created_at: list.created_at,
-      updated_at: list.updated_at
+      id: list!.dataValues.id,
+      name: list!.dataValues.name,
+      query: list!.dataValues.query,
+      created_at: list!.dataValues.created_at,
+      updated_at: list!.dataValues.updated_at
     })
   } catch (error) {
-    transaction.rollback()
     response.status(500).end()
   }
 })
