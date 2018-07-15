@@ -5,7 +5,7 @@ const search = (client: Twit, query: string): Promise<Twit.Twitter.SearchResults
   return new Promise((resolve, reject) => {
     client.get('search/tweets', {
       q: `${query} -RT`,
-      count: 10
+      count: 20
     }, (error, data, response) => {
       if (error) {
         return reject(error)
