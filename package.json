@@ -34,7 +34,8 @@
     "pg": "^7.4.3",
     "reflect-metadata": "^0.1.12",
     "sequelize": "^4.38.0",
-    "sequelize-typescript": "^0.6.5"
+    "sequelize-typescript": "^0.6.5",
+    "typescript-require": "^0.2.10"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
@@ -50,6 +51,7 @@
     "jest": "^22.0.4",
     "nodemon": "^1.13.0",
     "rimraf": "^2.6.2",
+    "sequelize-cli": "^4.0.0",
     "supertest": "^3.0.0",
     "ts-jest": "^22.0.4",
     "ts-node": "^5.0.0",

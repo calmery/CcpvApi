@@ -1,12 +1,12 @@
 import url from 'url'
 import dotenv from 'dotenv'
+import config from './config'
 
 dotenv.config()
 
 // Postgres
 export const SEQUELIZE_CONFIG = (() => {
-  // Postgres との接続に使用する
-  // process.env.DATABASE_URL があるときはそちらをそのまま使用する
+  const env = process.env.NODE_ENV || 'development'
 
   const baseConfig = {
     dialect: 'postgres',
@@ -20,22 +20,28 @@ export const SEQUELIZE_CONFIG = (() => {
     }
   }
 
-  if (process.env.DATABASE_URL) {
-    const config = url.parse(process.env.DATABASE_URL)
+  if (env === 'production') {
+    const databaseUrl = url.parse(process.env.DATABASE_URL!)
 
     return Object.assign(baseConfig, {
-      host: config.hostname,
-      username: config.auth!.split(':')[0],
-      password: config.auth!.split(':')[1],
-      name: config.path!.slice(1)
+      host: databaseUrl.hostname,
+      username: databaseUrl.auth!.split(':')[0],
+      password: databaseUrl.auth!.split(':')[1],
+      name: databaseUrl.path!.slice(1)
     })
   }
 
+  let extendedConfig = config.development
+
+  if (env === 'test') {
+    extendedConfig = config.test
+  }
+
   return Object.assign(baseConfig, {
-    host: 'localhost',
-    username: '',
-    password: '',
-    name: 'ccpv', // Database name
+    host: extendedConfig.host,
+    username: extendedConfig.username,
+    password: extendedConfig.password,
+    name: extendedConfig.database, // Database name
   })
 })()
 

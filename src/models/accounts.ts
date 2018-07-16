@@ -38,8 +38,8 @@ export default class Accounts extends Model<Accounts> {
   access_token_secret: string
 
   @CreatedAt
-  createdAt: Date
+  created_at: Date
 
   @UpdatedAt
-  updatedAt: Date
+  updated_at: Date
 }
