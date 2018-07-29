@@ -1,15 +1,16 @@
-import { Sequelize, Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, Unique, CreatedAt, UpdatedAt, IsUUID, Default } from 'sequelize-typescript'
+import { Sequelize, Model, Table, Column, AllowNull, PrimaryKey, AutoIncrement, Unique, CreatedAt, UpdatedAt, DeletedAt, IsUUID, Default, HasMany } from 'sequelize-typescript'
+import List from './lists'
 
 @Table({
   tableName: 'accounts',
   timestamps: true,
   paranoid: true
 })
-export default class Accounts extends Model<Accounts> {
+export default class Account extends Model<Account> {
   @PrimaryKey
   @AutoIncrement
-	@Column
-	id: number
+  @Column
+  id: number
 
   @AllowNull(false)
 	@Column
@@ -38,8 +39,16 @@ export default class Accounts extends Model<Accounts> {
   access_token_secret: string
 
   @CreatedAt
-  createdAt: Date
+  created_at: Date
 
   @UpdatedAt
-  updatedAt: Date
+  updated_at: Date
+
+  @DeletedAt
+  deleted_at: Date
+
+  // Association
+
+  @HasMany(() => List)
+  lists: List[]
 }
