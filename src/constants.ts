@@ -59,3 +59,7 @@ export const CLIENT_EMAIL = process.env.CLIENT_EMAIL
 
 // Notifications
 export const NUMBER_OF_NOTIFICATIONS = 5
+
+// Twitter
+export const CONSUMER_KEY = process.env.CONSUMER_KEY!
+export const CONSUMER_SECRET = process.env.CONSUMER_SECRET!
