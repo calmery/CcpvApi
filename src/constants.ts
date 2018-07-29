@@ -39,10 +39,26 @@ export const SEQUELIZE_CONFIG = (() => {
   })
 })()
 
+// Server URL
+export const PORT = process.env.PORT || 8000
+export const URL = (() => {
+  if (process.env.NODE_ENV === 'production') {
+    return `https://ccpv.herokuapp.com`
+  }
+
+  // Staging
+
+  // Development
+  return `http://localhost:${PORT}`
+})()
+
 // Firebase
 export const PROJECT_ID = process.env.PROJECT_ID
 export const PRIVATE_KEY = unescape(process.env.PRIVATE_KEY!)
 export const CLIENT_EMAIL = process.env.CLIENT_EMAIL
+
+// Notifications
+export const NUMBER_OF_NOTIFICATIONS = 5
 
 // Twitter
 export const CONSUMER_KEY = process.env.CONSUMER_KEY!
