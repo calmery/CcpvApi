@@ -23,10 +23,6 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.get('/', (request, response) => {
-  response.send('Hello !')
-})
-
 interface Request extends express.Request {
   account?: Account
 }
@@ -54,6 +50,107 @@ const requireApiKey = (request: Request, response: Response, next: NextFunction)
   })
 }
 
+app.get('/', (request, response) => {
+  response.send('CCPV')
+})
+
+app.post('/list/:listId', requireApiKey, async (request: Request, response: Response) => {
+  try {
+    const account = request.account!
+    const tweets = request.body.tweets
+
+    if (tweets === undefined) {
+      response.status(400).end()
+      return
+    }
+
+    const list = await List.find({
+      where: {
+        id: {
+          [Sequelize.Op.eq]: request.params.listId
+        },
+        account_id: {
+          [Sequelize.Op.eq]: account.id
+        }
+      }
+    })
+
+    if (list === null) {
+      response.status(400).end()
+      return
+    }
+
+    for (let i = 0; i < tweets.length; i++) {
+      const tweet = tweets[i]
+
+      await ListTweet.update({
+        is_safe: tweet.is_safe
+      }, {
+        where: {
+          list_id: {
+            [Sequelize.Op.eq]: request.params.listId
+          },
+          tweet_id: {
+            [Sequelize.Op.eq]: tweet.id
+          }
+        }
+      })
+    }
+
+    response.status(200).end()
+  } catch (_) {
+    response.status(500).end()
+  }
+})
+
+// 自分の作成したリストであれば取得して返す
+app.get('/list/:listId', requireApiKey, async (request: Request, response: Response) => {
+  try {
+    const account = request.account!
+
+    const list = await List.find({
+      where: {
+        id: {
+          [Sequelize.Op.eq]: request.params.listId
+        },
+        account_id: {
+          [Sequelize.Op.eq]: account.dataValues.id
+        }
+      },
+      attributes: ['id', 'name', 'query', 'created_at', 'updated_at'],
+      include: [{
+        model: ListTweet,
+        attributes: ['is_safe'],
+        include: [{
+          model: Tweet,
+          attributes: ['id', 'text', 'retweet_count', 'favorite_count', 'created_at'],
+          include: [{
+            model: User
+          }, {
+            model: Media,
+            attributes: ['id', 'display_url', 'media_url', 'type']
+          }, {
+            model: Mention,
+            attributes: ['user_id'],
+            include: [{
+              model: User
+            }]
+          }]
+        }]
+      }]
+    })
+
+    if (list === null) {
+      response.status(404).end()
+    } else {
+      response.status(200).json(list)
+    }
+  } catch (_) {
+    response.status(500).end()
+  }
+})
+
+// 自分のリストの一覧を返す
 app.get('/list', requireApiKey, async (request: Request, response: Response) => {
   try {
     const account = request.account!
