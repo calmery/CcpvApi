@@ -450,7 +450,7 @@ app.post('/message', isAdmin, async (request, response) => {
   const title = request.body.title
   const message = request.body.message
 
-  if (title === undefined || message === undefined) {
+  if (title === undefined || message === undefined || title === '' || message === '') {
     response.status(400).end()
     return
   }
