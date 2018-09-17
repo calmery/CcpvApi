@@ -420,35 +420,6 @@ app.post('/authentication', async (request, response) => {
   })
 })
 
-// Admin
-
-app.get('/admin', async (request, response) => {
-  try {
-    const safe = await ListTweet.findAndCountAll({
-      where: {
-        is_safe: {
-          [Sequelize.Op.eq]: true
-        }
-      }
-    });
-
-    const unsafe = await ListTweet.findAndCountAll({
-      where: {
-        is_safe: {
-          [Sequelize.Op.eq]: false
-        }
-      }
-    });
-
-    response.json({
-      safe: safe.count,
-      unsafe: unsafe.count
-    });
-  } catch (_) {
-    response.status(500).end()
-  }
-});
-
 // Postgres との同期が完了してからサーバを起動する
 const _ = (async () => {
   try {
