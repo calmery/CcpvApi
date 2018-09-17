@@ -8,10 +8,10 @@ import firebase from './firebase'
 import Sequelize from 'sequelize'
 import sequelize from './sequelize'
 
-import { URL, PORT, NUMBER_OF_NOTIFICATIONS } from './constants'
+import { URL, PORT, NUMBER_OF_MESSAGES } from './constants'
 
 import Account from './models/accounts'
-import Notification from './models/notifications'
+import Message from './models/messages'
 import List from './models/lists'
 import ListTweet from './models/lists_tweets'
 import Tweet from './models/tweets'
@@ -360,15 +360,15 @@ app.post('/list', requireApiKey, async (request: Request, response: Response) =>
 })
 
 // お知らせを取得する
-// /notification?start=読み飛ばすお知らせの個数
-// /notification?start=0（/notification） 初めから
-// /notification?start=5 5 個読み飛ばす，6 個目の位置から
-app.get('/notification', async (request, response) => {
+// /messages?start=読み飛ばすお知らせの個数
+// /messages?start=0（/messages） 初めから
+// /messages?start=5 5 個読み飛ばす，6 個目の位置から
+app.get('/messages', async (request, response) => {
   try {
     const start = parseInt(request.query.start, 10) || 0
 
-    const notifications = await Notification.findAll({
-      limit: NUMBER_OF_NOTIFICATIONS,
+    const messages = await Message.findAll({
+      limit: NUMBER_OF_MESSAGES,
       offset: start,
       order: [
         ['created_at', 'DESC']
@@ -376,16 +376,16 @@ app.get('/notification', async (request, response) => {
       attributes: ['id', 'title', 'message', 'created_at']
     })
 
-    let next_url = null
+    let next = null
 
     // 取得した通知が limit で指定した値であるとき，まだ通知が存在する可能性があるので次の通知を取得するための URL を返す．
-    if (notifications.length === NUMBER_OF_NOTIFICATIONS) {
-      next_url = `${URL}/notification?start=${start + NUMBER_OF_NOTIFICATIONS}`
+    if (messages.length === NUMBER_OF_MESSAGES) {
+      next = start + NUMBER_OF_MESSAGES
     }
 
     response.json({
-      notifications,
-      next_url
+      messages,
+      next
     })
   } catch (_) {
     response.status(500).end()
@@ -446,7 +446,7 @@ app.post('/authentication', async (request, response) => {
 
 // Admin
 
-app.post('/notification', isAdmin, async (request, response) => {
+app.post('/message', isAdmin, async (request, response) => {
   const title = request.body.title
   const message = request.body.message
 
@@ -456,25 +456,25 @@ app.post('/notification', isAdmin, async (request, response) => {
   }
 
   try {
-    const notification = Notification.build({
+    const newMessage = Message.build({
       title, message
     })
 
-    await notification.save()
+    await newMessage.save()
 
     response.status(200).send({
-      id: notification.getDataValue('id'),
-      title: notification.getDataValue('title'),
-      message: notification.getDataValue('message'),
-      created_at: notification.getDataValue('created_at')
+      id: newMessage.getDataValue('id'),
+      title: newMessage.getDataValue('title'),
+      message: newMessage.getDataValue('message'),
+      created_at: newMessage.getDataValue('created_at')
     })
   } catch (_) {
     response.status(500).end()
   }
 })
 
-app.delete('/notification', isAdmin, async (request, response) => {
-  const id = request.body.id
+app.delete('/message/:id', isAdmin, async (request, response) => {
+  const id = request.params.id
 
   if (id === undefined) {
     response.status(400).end()
@@ -482,7 +482,7 @@ app.delete('/notification', isAdmin, async (request, response) => {
   }
 
   try {
-    await Notification.destroy({
+    await Message.destroy({
       where: {
         id: {
           [Sequelize.Op.eq]: id

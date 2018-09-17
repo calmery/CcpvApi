@@ -1,11 +1,11 @@
 import { Table, Column, Model, AllowNull, PrimaryKey, AutoIncrement, CreatedAt, UpdatedAt, DeletedAt } from 'sequelize-typescript'
 
 @Table({
-  tableName: 'notifications',
+  tableName: 'messages',
   timestamps: true,
   paranoid: true
 })
-export default class Notification extends Model<Notification> {
+export default class Message extends Model<Message> {
   @PrimaryKey
   @AutoIncrement
 	@Column
