@@ -372,7 +372,8 @@ app.get('/notification', async (request, response) => {
       offset: start,
       order: [
         ['created_at', 'DESC']
-      ]
+      ],
+      attributes: ['id', 'title', 'message', 'created_at']
     })
 
     let next_url = null
@@ -444,6 +445,56 @@ app.post('/authentication', async (request, response) => {
 })
 
 // Admin
+
+app.post('/notification', isAdmin, async (request, response) => {
+  const title = request.body.title
+  const message = request.body.message
+
+  if (title === undefined || message === undefined) {
+    response.status(400).end()
+    return
+  }
+
+  try {
+    const notification = Notification.build({
+      title, message
+    })
+
+    await notification.save()
+
+    response.status(200).send({
+      id: notification.getDataValue('id'),
+      title: notification.getDataValue('title'),
+      message: notification.getDataValue('message'),
+      created_at: notification.getDataValue('created_at')
+    })
+  } catch (_) {
+    response.status(500).end()
+  }
+})
+
+app.delete('/notification', isAdmin, async (request, response) => {
+  const id = request.body.id
+
+  if (id === undefined) {
+    response.status(400).end()
+    return
+  }
+
+  try {
+    await Notification.destroy({
+      where: {
+        id: {
+          [Sequelize.Op.eq]: id
+        }
+      }
+    })
+
+    response.status(200).end()
+  } catch (_) {
+    response.status(500).end()
+  }
+})
 
 app.get('/admin', isAdmin, async (request, response) => {
   try {
