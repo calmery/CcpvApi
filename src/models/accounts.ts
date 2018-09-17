@@ -47,6 +47,11 @@ export default class Account extends Model<Account> {
   @DeletedAt
   deleted_at: Date
 
+  @AllowNull(false)
+  @Default(false)
+	@Column
+	is_admin: boolean
+
   // Association
 
   @HasMany(() => List)

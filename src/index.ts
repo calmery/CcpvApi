@@ -54,6 +54,27 @@ const requireApiKey = (request: Request, response: Response, next: NextFunction)
   })
 }
 
+const isAdmin = (request: Request, response: Response, next: NextFunction) => {
+  const apiKey = request.headers['x-api-key']
+
+  Account.find({
+    where: {
+      api_key: {
+        [Sequelize.Op.eq]: apiKey
+      }
+    }
+  }).then(account => {
+    if (account === null || !account.is_admin) {
+      response.status(401).end()
+      return
+    }
+
+    request.account = account
+
+    next()
+  })
+}
+
 app.get('/', (request, response) => {
   response.send('CCPV')
 })
@@ -404,7 +425,8 @@ app.post('/authentication', async (request, response) => {
       response.status(200).json({
         id: user.getDataValue('id'),
         name: user.getDataValue('name'),
-        api_key: user.getDataValue('api_key')
+        api_key: user.getDataValue('api_key'),
+        is_admin: user.getDataValue('is_admin')
       })
     } catch (_) {
       response.status(500).end()
@@ -416,13 +438,14 @@ app.post('/authentication', async (request, response) => {
   response.status(200).json({
     id: alreadyRegistered.getDataValue('id'),
     name: alreadyRegistered.getDataValue('name'),
-    api_key: alreadyRegistered.getDataValue('api_key')
+    api_key: alreadyRegistered.getDataValue('api_key'),
+    is_admin: alreadyRegistered.getDataValue('is_admin')
   })
 })
 
 // Admin
 
-app.get('/admin', async (request, response) => {
+app.get('/admin', isAdmin, async (request, response) => {
   try {
     const safe = await ListTweet.findAndCountAll({
       where: {
