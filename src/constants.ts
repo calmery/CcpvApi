@@ -58,7 +58,7 @@ export const PRIVATE_KEY = unescape(process.env.PRIVATE_KEY!)
 export const CLIENT_EMAIL = process.env.CLIENT_EMAIL
 
 // Messages
-export const NUMBER_OF_MESSAGES= 5
+export const NUMBER_OF_MESSAGES = 10
 
 // Twitter
 export const CONSUMER_KEY = process.env.CONSUMER_KEY!
