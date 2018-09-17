@@ -277,7 +277,7 @@ const createList = async (account: Account, name: string, searchResults: Twit.Tw
               defaults: {
                 id: entities.media[i].id,
                 tweet_id: status.id,
-                media_url: entities.media[i].url,
+                media_url: entities.media[i].media_url_https,
                 type: entities.media[i].type,
                 display_url: entities.media[i].display_url
               },
